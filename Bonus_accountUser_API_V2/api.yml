@@ -1,0 +1,159 @@
+swagger: "2.0"
+info:
+  version: "2.0.0"
+  title: "ArgentBank API"
+
+host: "localhost:3001"
+basePath: "/api/v2"
+schemes:
+  - "http"
+
+paths:
+
+  /user/login:
+    post:
+      summary: "Authentifie un utilisateur et retourne un token"
+      parameters:
+        - name: "user"
+          in: "body"
+          description: "Email et mot de passe de l'utilisateur"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              email:
+                type: "string"
+              password:
+                type: "string"
+      responses:
+        200:
+          description: "Réponse réussie, contient le token"
+
+  /user/profile:
+    post:
+      summary: "Obtient les informations du profil de l'utilisateur"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Token d'authentification"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Réponse réussie, contient les informations du profil"
+    put:
+      summary: "Modifie le nom d'utilisateur"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Token d'authentification"
+          required: true
+          type: "string"
+        - name: "user"
+          in: "body"
+          description: "Nouveau nom d'utilisateur"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              userName:
+                type: "string"
+      responses:
+        200:
+          description: "Réponse réussie, le nom d'utilisateur a été modifié"
+
+  /user/accounts:
+    get:
+      summary: "Récupère tous les comptes d'un utilisateur"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Token d'authentification"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Réponse réussie, contient une liste des comptes"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Account"
+
+  /user/accounts/{accountId}/transactions:
+    get:
+      summary: "Récupère les transactions pour un compte spécifique"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Token d'authentification"
+          required: true
+          type: "string"
+        - name: "accountId"
+          in: "path"
+          description: "ID du compte pour lequel récupérer les transactions"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Réponse réussie, contient une liste des transactions"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Transaction"
+              
+  /user/accounts/{accountId}/transactions/{transactionId}:
+    put:
+      summary: "Met à jour la description d'une transaction spécifique"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Token d'authentification"
+          required: true
+          type: "string"
+        - name: "accountId"
+          in: "path"
+          description: "ID du compte associé à la transaction"
+          required: true
+          type: "string"
+        - name: "transactionId"
+          in: "path"
+          description: "ID de la transaction à mettre à jour"
+          required: true
+          type: "string"
+        - name: "description"
+          in: "body"
+          description: "Nouvelle description pour la transaction"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              description:
+                type: "string"
+      responses:
+        200:
+          description: "Réponse réussie, la description de la transaction a été mise à jour"
+
+definitions:
+  Account:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      amount:
+        type: "number"
+      description:
+        type: "string"
+      button:
+        type: "string"
+
+  Transaction:
+    type: "object"
+    properties:
+      date:
+        type: "string"
+      description:
+        type: "string"
+      amount:
+        type: "number"
+      balance:
+        type: "number"
