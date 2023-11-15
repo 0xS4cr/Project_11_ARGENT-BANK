@@ -62,9 +62,9 @@ paths:
         200:
           description: "Réponse réussie, le nom d'utilisateur a été modifié"
 
-  /user/accounts:
+  /accounts:
     get:
-      summary: "Récupère tous les comptes d'un utilisateur"
+      summary: "Récupère tous les comptes de l'utilisateur connecté"
       parameters:
         - name: "Authorization"
           in: "header"
@@ -73,15 +73,15 @@ paths:
           type: "string"
       responses:
         200:
-          description: "Réponse réussie, contient une liste des comptes"
+          description: "Réponse réussie, liste des comptes de l'utilisateur"
           schema:
             type: "array"
             items:
               $ref: "#/definitions/Account"
 
-  /user/accounts/{accountId}/transactions:
+  /accounts/{accountId}/transactions:
     get:
-      summary: "Récupère les transactions pour un compte spécifique"
+      summary: "Récupère les transactions d'un compte spécifique"
       parameters:
         - name: "Authorization"
           in: "header"
@@ -90,29 +90,43 @@ paths:
           type: "string"
         - name: "accountId"
           in: "path"
-          description: "ID du compte pour lequel récupérer les transactions"
+          description: "ID du compte pour récupérer les transactions"
           required: true
           type: "string"
       responses:
         200:
-          description: "Réponse réussie, contient une liste des transactions"
+          description: "Réponse réussie, liste des transactions pour le compte"
           schema:
             type: "array"
             items:
               $ref: "#/definitions/Transaction"
-              
-  /user/accounts/{accountId}/transactions/{transactionId}:
-    put:
-      summary: "Met à jour la description d'une transaction spécifique"
+
+  /transactions/{transactionId}:
+    get:
+      summary: "Affiche les détails d'une transaction spécifique"
       parameters:
         - name: "Authorization"
           in: "header"
           description: "Token d'authentification"
           required: true
           type: "string"
-        - name: "accountId"
+        - name: "transactionId"
           in: "path"
-          description: "ID du compte associé à la transaction"
+          description: "ID de la transaction à afficher"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "Réponse réussie, détails de la transaction"
+          schema:
+            $ref: "#/definitions/TransactionDetail"
+
+    put:
+      summary: "Met à jour la catégorie et la note d'une transaction spécifique"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          description: "Token d'authentification"
           required: true
           type: "string"
         - name: "transactionId"
@@ -120,23 +134,22 @@ paths:
           description: "ID de la transaction à mettre à jour"
           required: true
           type: "string"
-        - name: "description"
+        - name: "transactionUpdate"
           in: "body"
-          description: "Nouvelle description pour la transaction"
+          description: "Mise à jour de la catégorie et de la note"
           required: true
           schema:
-            type: "object"
-            properties:
-              description:
-                type: "string"
+            $ref: "#/definitions/TransactionUpdate"
       responses:
         200:
-          description: "Réponse réussie, la description de la transaction a été mise à jour"
+          description: "Réponse réussie, la transaction a été mise à jour"
 
 definitions:
   Account:
     type: "object"
     properties:
+      accountId:
+        type: "string"
       title:
         type: "string"
       amount:
@@ -149,6 +162,8 @@ definitions:
   Transaction:
     type: "object"
     properties:
+      transactionId:
+        type: "string"
       date:
         type: "string"
       description:
@@ -157,3 +172,23 @@ definitions:
         type: "number"
       balance:
         type: "number"
+
+  TransactionDetail:
+    type: "object"
+    properties:
+      transactionId:
+        type: "string"
+      transactionType:
+        type: "string"
+      category:
+        type: "string"
+      note:
+        type: "string"
+
+  TransactionUpdate:
+    type: "object"
+    properties:
+      category:
+        type: "string"
+      note:
+        type: "string"

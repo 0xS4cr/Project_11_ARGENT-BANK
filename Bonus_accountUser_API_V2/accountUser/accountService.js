@@ -13,7 +13,13 @@ module.exports.getAccounts = async serviceData => {
       throw new Error('No accounts found for the user!');
     }
 
-    return accounts;
+    return accounts.map(account => ({
+      accountId: account._id,
+      title: account.title,
+      amount: account.amount,
+      description: account.description,
+      button: account.button
+    }));
   } catch (error) {
     console.error('Error in accountService.js', error);
     throw new Error(error);
@@ -28,21 +34,29 @@ module.exports.getTransactions = async (serviceData, accountId) => {
       throw new Error('No transactions found for the account!');
     }
 
-    return transactions;
+    return transactions.map(transaction => ({
+      transactionId: transaction._id,
+      date: transaction.date,
+      description: transaction.description,
+      amount: transaction.amount,
+      balance: transaction.balance
+    }));
   } catch (error) {
     console.error('Error in accountService.js', error);
     throw new Error(error);
   }
 };
 
-module.exports.updateTransactionDescription = async (serviceData, accountId, transactionId) => {
+module.exports.updateTransaction = async (serviceData, transactionId) => {
   try {
-    const jwtToken = serviceData.headers.authorization.split('Bearer ')[1];
-    const decodedJwtToken = jwt.decode(jwtToken);
+    const updateData = {
+      category: serviceData.body.category,
+      note: serviceData.body.note
+    };
 
     const transaction = await Transaction.findOneAndUpdate(
-      { _id: transactionId, accountId: accountId, userId: decodedJwtToken.id },
-      { description: serviceData.body.description },
+      { _id: transactionId },
+      updateData,
       { new: true }
     );
 
